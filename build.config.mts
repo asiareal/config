@@ -33,6 +33,8 @@ export default defineConfig({
         pageRouteBasePath: '/',
         title: '@asiareal/config',
         navBarTitle: '@asiareal/config',
+        url: 'https://asiareal.github.io',
+        baseUrl: '/config',
       },
     ],
   ],

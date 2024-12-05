@@ -9,6 +9,7 @@
     "packages:build": "pnpm -r run build",
     "docs:start": "ice-pkg start",
     "docs:build": "ice-pkg build",
+    "deploy": "gh-pages -d build",
     "create": "pnpm create @ice/pkg --workspace",
     "eslint": "eslint --cache --ext .js,.jsx,.ts,.tsx ./",
     "eslint:fix": "pnpm eslint --fix"
@@ -24,6 +25,7 @@
     "@types/react": "^18.0.28",
     "clsx": "^1.2.1",
     "eslint": "^8.0.0",
+    "gh-pages": "^6.2.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "rimraf": "^4.1.2"
