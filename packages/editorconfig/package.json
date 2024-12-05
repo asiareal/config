@@ -1,0 +1,15 @@
+{
+  "name": "@asiareal/editorconfig",
+  "version": "0.1.0",
+  "private": true,
+  "description": "editorconfig config",
+  "sideEffects": false,
+  "keywords": [
+    "editorconfig",
+    "config"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "MIT"
+}

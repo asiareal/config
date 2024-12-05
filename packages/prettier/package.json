@@ -1,0 +1,21 @@
+{
+  "name": "@asiareal/config-prettier",
+  "version": "0.1.0",
+  "description": "prettier config",
+  "files": [
+    ".prettierrc.json"
+  ],
+  "main": ".prettierrc.json",
+  "sideEffects": false,
+  "keywords": [
+    "config",
+    "prettier"
+  ],
+  "peerDependencies": {
+    "prettier": "^2.4.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "MIT"
+}
