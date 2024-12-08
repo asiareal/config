@@ -1,0 +1,3 @@
+export = uniqueFilename;
+/** Use the md5 value of docPath */
+declare function uniqueFilename(code: any): string;

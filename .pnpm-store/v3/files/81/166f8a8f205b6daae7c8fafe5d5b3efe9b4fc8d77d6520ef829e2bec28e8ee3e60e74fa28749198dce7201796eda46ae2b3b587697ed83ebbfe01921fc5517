@@ -1,0 +1,16 @@
+import * as swc from '@swc/core';
+/**
+ * plugin-minify use minimize bundle outputs using swc
+ */
+const minifyPlugin = (sourcemap, minifyOptions) => {
+    return {
+        name: 'ice-pkg:minify',
+        renderChunk(code) {
+            return swc.minify(code, Object.assign({ 
+                // Minify amd module will cause an error(`module` reserved Words will be declared in the top level).
+                module: true, sourceMap: !!sourcemap }, minifyOptions));
+        },
+    };
+};
+export default minifyPlugin;
+//# sourceMappingURL=minify.js.map

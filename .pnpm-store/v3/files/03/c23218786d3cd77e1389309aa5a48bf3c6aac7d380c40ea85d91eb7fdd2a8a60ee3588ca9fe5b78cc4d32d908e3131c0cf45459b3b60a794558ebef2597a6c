@@ -1,0 +1,7 @@
+export = extractCodePlugin;
+/**
+ * Remark Plugin to extract codeBlock & rendered as component
+ * @type {import('unified').Plugin}
+ * @param {options: { mobilePreview: boolean; baseUrl: string; mobilePreviewUrlParams: string; }}
+ */
+declare const extractCodePlugin: import('unified').Plugin;

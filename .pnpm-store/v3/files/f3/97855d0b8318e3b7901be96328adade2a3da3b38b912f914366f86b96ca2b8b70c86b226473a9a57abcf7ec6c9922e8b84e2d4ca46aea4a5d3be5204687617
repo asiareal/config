@@ -1,0 +1,3 @@
+import type { PluginDocusaurusOptions } from './types.mjs';
+import type { PluginAPI } from '@ice/pkg';
+export declare const doc: (api: PluginAPI, options: PluginDocusaurusOptions) => Promise<void>;

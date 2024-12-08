@@ -1,0 +1,4 @@
+import { TransformOptions } from '@babel/core';
+import { BabelPluginOptions } from 'src/rollupPlugins/babel.js';
+declare function getBabelOptions(plugins: babel.PluginItem[], options: BabelPluginOptions, modifyBabelOptions?: (babelCompileOptions: TransformOptions) => TransformOptions): TransformOptions;
+export default getBabelOptions;

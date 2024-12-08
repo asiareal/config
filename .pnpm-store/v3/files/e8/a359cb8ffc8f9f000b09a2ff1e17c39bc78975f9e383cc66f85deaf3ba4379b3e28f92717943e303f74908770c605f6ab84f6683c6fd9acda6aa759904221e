@@ -1,0 +1,4 @@
+import type { TaskValue } from '../types.js';
+export declare function formatEntry(inputEntry: string | string[] | Record<string, string>): Record<string, string>;
+export declare const getTransformEntryDirs: (rootDir: string, entry: Record<string, string>) => string[];
+export declare const getTransformDefaultOutputDir: (rootDir: string, taskName: TaskValue) => string;

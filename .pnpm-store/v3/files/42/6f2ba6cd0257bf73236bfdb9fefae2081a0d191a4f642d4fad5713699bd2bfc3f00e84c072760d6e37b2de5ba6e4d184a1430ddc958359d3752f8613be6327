@@ -1,0 +1,76 @@
+{
+  "name": "@applint/spec",
+  "version": "1.2.3",
+  "description": "在 ICE、Rax、React 项目中更简单接入 ESLint(support TypeScript) / Stylelint / Prettier / Commitlint 规则。",
+  "main": "dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/apptools-lab/applint"
+  },
+  "bugs": {
+    "url": "https://github.com/apptools-lab/applint/issues"
+  },
+  "homepage": "https://github.com/apptools-lab/applint",
+  "scripts": {
+    "build": "rm -rf dist && tsc",
+    "prepublishOnly": "npm run build",
+    "watch": "tsc -w",
+    "test": "jest",
+    "pretest": "npm run build"
+  },
+  "dependencies": {
+    "@applint/commitlint-config": "^1.0.0",
+    "@applint/eslint-config": "^1.0.0",
+    "@applint/prettier-config": "^1.0.0",
+    "@applint/stylelint-config": "^1.0.0",
+    "@babel/core": "^7.17.2",
+    "@babel/eslint-parser": "^7.17.0",
+    "@babel/preset-react": "^7.16.7",
+    "@typescript-eslint/eslint-plugin": "^5.0.0",
+    "@typescript-eslint/parser": "^5.0.0",
+    "deepmerge": "^4.2.2",
+    "eslint-config-ali": "^13.1.0",
+    "eslint-plugin-import": "^2.25.2",
+    "eslint-plugin-jsx-a11y": "^6.4.1",
+    "eslint-plugin-jsx-plus": "^0.1.0",
+    "eslint-plugin-rax-compile-time-miniapp": "^1.0.0",
+    "eslint-plugin-react": "^7.26.1",
+    "eslint-plugin-react-hooks": "^4.2.0",
+    "eslint-plugin-vue": "^8.4.1",
+    "require-all": "^3.0.0",
+    "stylelint-scss": "^4.1.0",
+    "vue-eslint-parser": "^8.2.0",
+    "postcss": "^8.4.7",
+    "postcss-scss": "^4.0.3",
+    "postcss-less": "^6.0.0"
+  },
+  "devDependencies": {
+    "@commitlint/lint": "^16.0.0",
+    "@commitlint/load": "^16.0.0",
+    "@commitlint/types": "^16.0.0",
+    "@types/eslint": "^8.2.2",
+    "@types/jest": "^27.4.0",
+    "@types/prettier": "^2.4.3",
+    "@types/require-all": "^3.0.3",
+    "eslint": "^8.7.0",
+    "jest": "^27.4.7",
+    "prettier": "^2.5.1",
+    "rax": "^1.2.2",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "stylelint": "^14.2.0",
+    "ts-jest": "^27.1.3",
+    "typescript": "^4.4.4"
+  },
+  "peerDependencies": {
+    "eslint": ">=6.8.0",
+    "stylelint": ">=14.0.0"
+  },
+  "engines": {
+    "node": ">=12.0.0"
+  }
+}

@@ -1,0 +1,442 @@
+import consola from 'consola';
+import fs from 'fs-extra';
+import { resolve, join, isAbsolute } from 'path';
+import * as acorn from 'acorn';
+import { combineSourcemaps, ensureWatchedFile, generateCodeFrame, isObject, isExternalUrl, normalizePath, numberToPos, timeFrom, createDebugger, safeRequire, require, } from '../utils.js';
+import MagicString from 'magic-string';
+import colors from 'picocolors';
+import { performance } from 'perf_hooks';
+import { SourceMapConsumer } from 'source-map';
+import { createLogger } from './logger.js';
+export const FS_PREFIX = '/@fs/';
+export let parser = acorn.Parser;
+export async function createPluginContainer({ plugins, logger, root, output, build: { rollupOptions } }, moduleGraph, watcher) {
+    let ids = 0; // counter for generating unique emitted asset IDs
+    const files = new Map();
+    const isDebug = process.env.DEBUG;
+    const seenResolves = {};
+    const debugResolve = createLogger('resolve');
+    const debugPluginResolve = createDebugger('plugin-resolve');
+    const debugPluginTransform = createDebugger('plugin-transform');
+    const watchFiles = new Set();
+    // get rollup version
+    const rollupPkgPath = resolve(require.resolve('rollup'), '../../package.json');
+    const minimalContext = {
+        meta: {
+            rollupVersion: safeRequire(rollupPkgPath)
+                .version,
+            // rollupVersion: '2.3.4',
+            watchMode: true,
+        },
+    };
+    function warnIncompatibleMethod(method, plugin) {
+        logger.warn(colors.cyan(`[plugin:${plugin}] `) +
+            colors.yellow(`context method ${colors.bold(`${method}()`)} is not supported in serve mode. This plugin is likely not vite-compatible.`));
+    }
+    // throw when an unsupported ModuleInfo property is accessed,
+    // so that incompatible plugins fail in a non-cryptic way.
+    const ModuleInfoProxy = {
+        get(info, key) {
+            if (key in info) {
+                return info[key];
+            }
+            throw Error(`[vite] The "${key}" property of ModuleInfo is not supported.`);
+        },
+    };
+    // same default value of "moduleInfo.meta" as in Rollup
+    const EMPTY_OBJECT = Object.freeze({});
+    function getModuleInfo(id) {
+        const module = moduleGraph === null || moduleGraph === void 0 ? void 0 : moduleGraph.getModuleById(id);
+        if (!module) {
+            return null;
+        }
+        if (!module.info) {
+            module.info = new Proxy(
+            // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+            { id, meta: module.meta || EMPTY_OBJECT }, ModuleInfoProxy);
+        }
+        return module.info;
+    }
+    function updateModuleInfo(id, { meta }) {
+        if (meta) {
+            const moduleInfo = getModuleInfo(id);
+            if (moduleInfo) {
+                moduleInfo.meta = Object.assign(Object.assign({}, moduleInfo.meta), meta);
+            }
+        }
+    }
+    // we should create a new context for each async hook pipeline so that the
+    // active plugin in that pipeline can be tracked in a concurrency-safe manner.
+    // using a class to make creating new contexts more efficient
+    class Context {
+        constructor(initialPlugin) {
+            this.meta = minimalContext.meta;
+            this.ssr = false;
+            this._activeId = null;
+            this._activeCode = null;
+            this._addedImports = null;
+            this._activePlugin = initialPlugin || null;
+        }
+        parse(code, opts = {}) {
+            return parser.parse(code, Object.assign({ sourceType: 'module', ecmaVersion: 'latest', locations: true }, opts));
+        }
+        async resolve(id, importer, options) {
+            let skip;
+            if ((options === null || options === void 0 ? void 0 : options.skipSelf) && this._activePlugin) {
+                skip = new Set(this._resolveSkips);
+                skip.add(this._activePlugin);
+            }
+            let out = await container.resolveId(id, importer, { skip, ssr: this.ssr });
+            if (typeof out === 'string')
+                out = { id: out };
+            return out;
+        }
+        getModuleInfo(id) {
+            return getModuleInfo(id);
+        }
+        getModuleIds() {
+            return moduleGraph
+                ? moduleGraph.idToModuleMap.keys()
+                : Array.prototype[Symbol.iterator]();
+        }
+        addWatchFile(id) {
+            watchFiles.add(id);
+            (this._addedImports || (this._addedImports = new Set())).add(id);
+            if (watcher)
+                ensureWatchedFile(watcher, id, root);
+        }
+        getWatchFiles() {
+            return [...watchFiles];
+        }
+        emitFile(assetOrFile) {
+            function resolveFileName(fileName) {
+                if (!fileName)
+                    return;
+                if (isAbsolute(fileName))
+                    return fileName;
+                return resolve(root, output, fileName);
+            }
+            const { type, fileName } = assetOrFile;
+            const name = type === 'chunk' ? assetOrFile.name || assetOrFile.id : assetOrFile.name;
+            const source = type === 'asset' && assetOrFile.source;
+            const filename = resolveFileName(fileName);
+            const id = String(++ids);
+            files.set(id, { id, name, filename });
+            if (type === 'chunk') {
+                consola.warn(`type ${type} of this.emitFile is not supported in transform mode. This plugin is likely not compatible`);
+            }
+            else if (source) {
+                fs.writeFileSync(filename, source);
+            }
+            return id;
+        }
+        setAssetSource(assetId, source) {
+            const asset = files.get(String(assetId));
+            if (asset.type === 'chunk') {
+                return;
+            }
+            asset.source = source;
+            fs.writeFile(asset.filename, source);
+        }
+        getFileName() {
+            warnIncompatibleMethod('getFileName', this._activePlugin.name);
+            return '';
+        }
+        warn(e, position) {
+            const err = formatError(e, position, this);
+            const msg = err.message;
+            // const msg = buildErrorMessage(
+            //   err,
+            //   [colors.yellow(`warning: ${err.message}`)],
+            //   false,
+            // );
+            logger.warn(msg, {
+                clear: true,
+                timestamp: true,
+            });
+        }
+        error(e, position) {
+            // error thrown here is caught by the transform middleware and passed on
+            // the the error middleware.
+            throw formatError(e, position, this);
+        }
+    }
+    function formatError(e, position, ctx) {
+        let err = (typeof e === 'string' ? new Error(e) : e);
+        if (err.file && err.name === 'CssSyntaxError') {
+            err.id = normalizePath(err.file);
+        }
+        if (ctx._activePlugin)
+            err.plugin = ctx._activePlugin.name;
+        if (ctx._activeId && !err.id)
+            err.id = ctx._activeId;
+        if (ctx._activeCode && !err.pluginCode) {
+            err.pluginCode = ctx._activeCode;
+            const pos = position != null
+                ? position
+                : err.pos != null
+                    ? err.pos
+                    : // some rollup plugins, e.g. json, sets position instead of pos
+                        err.position;
+            if (pos != null) {
+                let errLocation;
+                try {
+                    errLocation = numberToPos(ctx._activeCode, pos);
+                }
+                catch (err2) {
+                    logger.error(colors.red(`Error in error handler:\n${err2.stack || err2.message}\n`), 
+                    // print extra newline to separate the two errors
+                    { error: err2 });
+                    throw err;
+                }
+                err.loc = err.loc || Object.assign({ file: err.id }, errLocation);
+                err.frame = err.frame || generateCodeFrame(ctx._activeCode, pos);
+            }
+            else if (err.loc) {
+                // css preprocessors may report errors in an included file
+                if (!err.frame) {
+                    let code = ctx._activeCode;
+                    if (err.loc.file) {
+                        err.id = normalizePath(err.loc.file);
+                        try {
+                            code = fs.readFileSync(err.loc.file, 'utf-8');
+                        }
+                        catch (_a) {
+                            // empty
+                        }
+                    }
+                    err.frame = generateCodeFrame(code, err.loc);
+                }
+            }
+            else if (err.line && err.column) {
+                err.loc = {
+                    file: err.id,
+                    line: err.line,
+                    column: err.column,
+                };
+                err.frame = err.frame || generateCodeFrame(err.id, err.loc);
+            }
+            if (err.loc && ctx instanceof TransformContext) {
+                const rawSourceMap = ctx._getCombinedSourcemap();
+                if (rawSourceMap) {
+                    const consumer = new SourceMapConsumer(rawSourceMap);
+                    const { source, line, column } = consumer.originalPositionFor({
+                        line: Number(err.loc.line),
+                        column: Number(err.loc.column),
+                        bias: SourceMapConsumer.GREATEST_LOWER_BOUND,
+                    });
+                    if (source) {
+                        err.loc = { file: source, line, column };
+                    }
+                }
+            }
+        }
+        // Be consistent of rollup https://github.com/rollup/rollup/blob/master/src/utils/pluginUtils.ts#L7
+        if (!(err instanceof Error)) {
+            err = Object.assign(new Error(err.message), err);
+        }
+        return err;
+    }
+    class TransformContext extends Context {
+        constructor(filename, code, inMap) {
+            super();
+            this.originalSourcemap = null;
+            this.sourcemapChain = [];
+            this.combinedMap = null;
+            this.filename = filename;
+            this.originalCode = code;
+            if (inMap) {
+                this.sourcemapChain.push(inMap);
+            }
+        }
+        _getCombinedSourcemap(createIfNull = false) {
+            let { combinedMap } = this;
+            for (let m of this.sourcemapChain) {
+                if (typeof m === 'string')
+                    m = JSON.parse(m);
+                if (!('version' in m)) {
+                    // empty, nullified source map
+                    this.combinedMap = null;
+                    combinedMap = this.combinedMap;
+                    this.sourcemapChain.length = 0;
+                    break;
+                }
+                if (!combinedMap) {
+                    combinedMap = m;
+                }
+                else {
+                    combinedMap = combineSourcemaps(this.filename, [
+                        Object.assign(Object.assign({}, m), { sourcesContent: combinedMap.sourcesContent }),
+                        combinedMap,
+                    ]);
+                }
+            }
+            if (!combinedMap) {
+                return createIfNull
+                    ? new MagicString(this.originalCode).generateMap({
+                        includeContent: true,
+                        hires: true,
+                        source: this.filename,
+                    })
+                    : null;
+            }
+            if (combinedMap !== this.combinedMap) {
+                this.combinedMap = combinedMap;
+                this.sourcemapChain.length = 0;
+            }
+            return this.combinedMap;
+        }
+        getCombinedSourcemap() {
+            return this._getCombinedSourcemap(true);
+        }
+    }
+    let closed = false;
+    const container = {
+        options: await (async () => {
+            let options = rollupOptions;
+            for (const plugin of plugins) {
+                if (!plugin.options)
+                    continue;
+                options =
+                    (await plugin.options.call(minimalContext, options)) || options;
+            }
+            if (options.acornInjectPlugins) {
+                parser = acorn.Parser.extend(options.acornInjectPlugins);
+            }
+            return Object.assign({ acorn, acornInjectPlugins: [] }, options);
+        })(),
+        getModuleInfo,
+        async buildStart() {
+            await Promise.all(plugins.map((plugin) => {
+                if (plugin.buildStart) {
+                    return plugin.buildStart.call(new Context(plugin), container.options);
+                }
+                return null;
+            }));
+        },
+        async resolveId(rawId, importer = join(root, 'index.html'), options) {
+            const skip = options === null || options === void 0 ? void 0 : options.skip;
+            const ssr = options === null || options === void 0 ? void 0 : options.ssr;
+            const ctx = new Context();
+            ctx.ssr = !!ssr;
+            ctx._resolveSkips = skip;
+            const resolveStart = isDebug ? performance.now() : 0;
+            let id = null;
+            const partial = {};
+            for (const plugin of plugins) {
+                if (!plugin.resolveId)
+                    continue;
+                if (skip === null || skip === void 0 ? void 0 : skip.has(plugin))
+                    continue;
+                ctx._activePlugin = plugin;
+                const pluginResolveStart = isDebug ? performance.now() : 0;
+                const result = await plugin.resolveId.call(ctx, rawId, importer, { ssr });
+                if (!result)
+                    continue;
+                if (typeof result === 'string') {
+                    id = result;
+                }
+                else {
+                    id = result.id;
+                    Object.assign(partial, result);
+                }
+                isDebug &&
+                    debugPluginResolve.info(timeFrom(pluginResolveStart), plugin.name);
+                // resolveId() is hookFirst - first non-null result is returned.
+                break;
+            }
+            if (isDebug && rawId !== id && !rawId.startsWith(FS_PREFIX)) {
+                const key = rawId + id;
+                // avoid spamming
+                if (!seenResolves[key]) {
+                    seenResolves[key] = true;
+                    debugResolve.info(`${timeFrom(resolveStart)}`, `${colors.cyan(rawId)} -> ${colors.dim(id)}`);
+                }
+            }
+            if (id) {
+                partial.id = isExternalUrl(id) ? id : normalizePath(id);
+                return partial;
+            }
+            else {
+                return null;
+            }
+        },
+        async load(id, options) {
+            const ssr = options === null || options === void 0 ? void 0 : options.ssr;
+            const ctx = new Context();
+            ctx.ssr = !!ssr;
+            for (const plugin of plugins) {
+                if (!plugin.load)
+                    continue;
+                ctx._activePlugin = plugin;
+                // eslint-disable-next-line no-await-in-loop
+                const result = await plugin.load.call(ctx, id, { ssr });
+                if (result != null) {
+                    if (isObject(result)) {
+                        updateModuleInfo(id, result);
+                    }
+                    return result;
+                }
+            }
+            return null;
+        },
+        async transform(code, id, options) {
+            const inMap = options === null || options === void 0 ? void 0 : options.inMap;
+            const ssr = options === null || options === void 0 ? void 0 : options.ssr;
+            const ctx = new TransformContext(id, code, inMap);
+            ctx.ssr = !!ssr;
+            let meta = null;
+            for (const plugin of plugins) {
+                if (!plugin.transform)
+                    continue;
+                ctx._activePlugin = plugin;
+                ctx._activeId = id;
+                ctx._activeCode = code;
+                const start = isDebug ? performance.now() : 0;
+                let result;
+                try {
+                    // eslint-disable-next-line no-await-in-loop
+                    result = await plugin.transform.call(ctx, code, id, { ssr });
+                }
+                catch (e) {
+                    ctx.error(e);
+                }
+                if (!result)
+                    continue;
+                isDebug &&
+                    debugPluginTransform(timeFrom(start), plugin.name);
+                if (isObject(result)) {
+                    if (result.code !== undefined) {
+                        code = result.code;
+                        if (result.map) {
+                            ctx.sourcemapChain.push(result.map);
+                        }
+                        // Add to support custom meta info
+                        if (result.meta) {
+                            meta = result.meta;
+                        }
+                    }
+                    updateModuleInfo(id, result);
+                }
+                else {
+                    code = result;
+                }
+            }
+            return {
+                code,
+                map: ctx._getCombinedSourcemap(),
+                meta,
+            };
+        },
+        async close() {
+            if (closed)
+                return;
+            const ctx = new Context();
+            await Promise.all(plugins.map((p) => p.buildEnd && p.buildEnd.call(ctx)));
+            await Promise.all(plugins.map((p) => p.closeBundle && p.closeBundle.call(ctx)));
+            closed = true;
+        },
+    };
+    return container;
+}
+//# sourceMappingURL=pluginContainer.js.map

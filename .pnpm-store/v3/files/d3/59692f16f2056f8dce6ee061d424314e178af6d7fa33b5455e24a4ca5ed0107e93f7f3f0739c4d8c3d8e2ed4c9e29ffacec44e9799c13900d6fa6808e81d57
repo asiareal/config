@@ -1,0 +1,10 @@
+// TODO: The enum name should be renamed to Task.
+export var TaskName;
+(function (TaskName) {
+    TaskName["TRANSFORM_CJS"] = "transform-cjs";
+    TaskName["TRANSFORM_ESM"] = "transform-esm";
+    TaskName["TRANSFORM_ES2017"] = "transform-es2017";
+    TaskName["BUNDLE_ES5"] = "bundle-es5";
+    TaskName["BUNDLE_ES2017"] = "bundle-es2017";
+})(TaskName || (TaskName = {}));
+//# sourceMappingURL=types.js.map

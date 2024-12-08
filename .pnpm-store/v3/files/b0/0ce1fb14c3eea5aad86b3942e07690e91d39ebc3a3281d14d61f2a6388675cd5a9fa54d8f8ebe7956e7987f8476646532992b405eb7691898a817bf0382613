@@ -1,0 +1,18 @@
+import { Service } from 'build-scripts';
+import build from './commands/build.js';
+import start from './commands/start.js';
+import test from './commands/test.js';
+const pkgService = new Service({
+    name: 'pkgService',
+    command: {
+        build,
+        start,
+        test,
+    },
+});
+export default pkgService;
+export * from './test/index.js';
+export * from './types.js';
+export { getBuiltInPlugins } from './utils.js';
+export { defineConfig } from './defineConfig.js';
+//# sourceMappingURL=index.js.map

@@ -1,0 +1,29 @@
+export declare const jsx: string[];
+export declare const typescript: string[];
+export declare const declaration: string[];
+export declare const ecmascript: string[];
+/**
+ * Wether is declaration file, checked by filepath
+ * @param filePath
+ * @returns
+ */
+export declare const isDeclaration: (filePath: string) => boolean;
+/**
+ * Wether is typescript only file, checked by filepath and suffix
+ * @param suffix
+ * @returns
+ */
+export declare const isTypescriptOnly: (suffix: string, filePath: string) => boolean;
+/**
+ * Wether is ecmascript only file, checked by filepath and suffix
+ * @param suffix
+ * @param filePath
+ * @returns
+ */
+export declare const isEcmascriptOnly: (suffix: string, filePath: string) => boolean;
+/**
+ * Wether is [j|t]SX，only need suffix
+ * @param suffix
+ * @returns
+ */
+export declare const isJsx: (suffix: string) => boolean;

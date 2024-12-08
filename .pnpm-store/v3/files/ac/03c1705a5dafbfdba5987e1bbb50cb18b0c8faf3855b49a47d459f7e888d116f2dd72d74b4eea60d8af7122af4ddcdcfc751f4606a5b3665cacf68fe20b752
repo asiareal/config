@@ -1,0 +1,6 @@
+import type { PluginDocusaurusOptions } from './types.mjs';
+import type { PluginAPI } from '@ice/pkg';
+export interface ConfigureDocusaurusOptions extends PluginDocusaurusOptions {
+    configuredPlugins: ReturnType<PluginAPI['getAllPlugin']>;
+}
+export declare function configureDocusaurus(rootDir: string, params: ConfigureDocusaurusOptions): void;

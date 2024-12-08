@@ -1,0 +1,12 @@
+/**
+ * Provide intellisense of user config.
+ */
+export const defineConfig = (options) => {
+    if (typeof options === 'function') {
+        return options();
+    }
+    else {
+        return options;
+    }
+};
+//# sourceMappingURL=defineConfig.js.map

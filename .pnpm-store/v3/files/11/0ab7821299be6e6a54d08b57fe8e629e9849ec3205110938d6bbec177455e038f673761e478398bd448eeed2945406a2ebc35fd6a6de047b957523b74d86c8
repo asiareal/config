@@ -1,0 +1,7 @@
+export default function getDefaultDefineValues(mode) {
+    return {
+        __DEV__: JSON.stringify(mode === 'development'),
+        'process.env.NODE_ENV': JSON.stringify(mode),
+    };
+}
+//# sourceMappingURL=getDefaultDefineValues.js.map

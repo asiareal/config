@@ -1,0 +1,18 @@
+export function getDemoFileInfo({ rootDir, code, lang, filepath, index }: {
+    rootDir: any;
+    code: any;
+    lang: any;
+    filepath: any;
+    index: any;
+}): {
+    demoFilename: string;
+    demoFilepath: any;
+};
+export function getPageFileInfo({ rootDir, demoFilepath, demoFilename }: {
+    rootDir: any;
+    demoFilepath: any;
+    demoFilename: any;
+}): {
+    pageFilename: any;
+    pageFileCode: string;
+};

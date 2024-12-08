@@ -1,0 +1,16 @@
+import { getBuiltInPlugins } from '../utils.js';
+export default async function getTaskConfig(service) {
+    const { taskConfigs, context } = await service.run({
+        command: 'test',
+        commandArgs: {},
+        getBuiltInPlugins,
+    });
+    if (taskConfigs.length === 0) {
+        throw new Error('No task config was found.');
+    }
+    return {
+        taskConfig: taskConfigs[0],
+        context,
+    };
+}
+//# sourceMappingURL=getTaskConfig.js.map

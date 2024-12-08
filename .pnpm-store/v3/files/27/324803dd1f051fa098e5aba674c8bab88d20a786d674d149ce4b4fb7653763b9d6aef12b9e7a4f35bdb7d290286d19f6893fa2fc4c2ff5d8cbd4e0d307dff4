@@ -1,0 +1,4 @@
+import type { Service } from 'build-scripts';
+import type { UserConfigExport, UserConfigFn as VitestUserConfigFn } from 'vitest/config';
+import type { TaskConfig, UserConfig } from '../types';
+export default function defineVitestConfig(service: Service<TaskConfig, {}, UserConfig>, userConfig: UserConfigExport): VitestUserConfigFn;

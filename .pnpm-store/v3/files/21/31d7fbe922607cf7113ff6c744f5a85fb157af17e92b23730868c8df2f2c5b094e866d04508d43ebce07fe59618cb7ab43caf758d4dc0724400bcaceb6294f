@@ -1,0 +1,43 @@
+import type { BundleTaskConfig, TaskConfig, UserConfig, BundleUserConfig, TransformUserConfig, TransformTaskConfig } from '../types.js';
+declare function getUserConfig(): ({
+    name: string;
+    validation: string;
+    defaultValue: string;
+    setConfig: (config: TaskConfig, entry: UserConfig['entry']) => TaskConfig;
+} | {
+    name: string;
+    validation: string;
+    defaultValue: {};
+    setConfig: (config: TaskConfig, alias: UserConfig['alias']) => TaskConfig;
+} | {
+    name: string;
+    validation: string;
+    setConfig: (config: TaskConfig, define: UserConfig['define']) => TaskConfig;
+    defaultValue?: undefined;
+} | {
+    name: string;
+    validation: (val: boolean | 'inline') => boolean;
+    setConfig: (config: TaskConfig, sourcemap: UserConfig['sourceMaps']) => TaskConfig;
+    defaultValue?: undefined;
+} | {
+    name: string;
+    validation: (val: string) => boolean;
+    defaultValue: string;
+    setConfig: (config: TaskConfig, jsxRuntime: UserConfig['jsxRuntime']) => TaskConfig;
+} | {
+    name: string;
+    validation: string;
+    defaultValue: boolean;
+    setConfig?: undefined;
+} | {
+    name: string;
+    validation: string;
+    defaultValue: TransformUserConfig;
+    setConfig: (config: TaskConfig, transformConfig: UserConfig['transform']) => TransformTaskConfig;
+} | {
+    name: string;
+    validation: string;
+    defaultValue: BundleUserConfig;
+    setConfig: (config: TaskConfig, bundleConfig: UserConfig['bundle']) => BundleTaskConfig;
+})[];
+export default getUserConfig;

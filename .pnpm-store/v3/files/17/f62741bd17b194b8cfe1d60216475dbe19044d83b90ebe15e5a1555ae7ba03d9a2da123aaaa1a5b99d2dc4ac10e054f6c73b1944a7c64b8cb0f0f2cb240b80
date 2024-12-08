@@ -1,0 +1,7 @@
+import { TaskConfig } from '../types';
+declare function getCliOptions(): {
+    name: string;
+    commands: string[];
+    setConfig: (config: TaskConfig, analyzer: boolean) => TaskConfig;
+}[];
+export default getCliOptions;

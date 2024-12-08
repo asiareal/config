@@ -1,0 +1,40 @@
+import visit from 'unist-util-visit';
+import { getDemoFileInfo, getPageFileInfo } from '../remark/getFileInfo.js';
+import checkCodeLang from '../remark/checkCodeLang.js';
+import genDemoPages from '../remark/genDemoPages.js';
+export default function getExtractCodePlugin(filepath, rootDir) {
+    return function extractCodePlugin() {
+        return async (ast)=>{
+            let demoIndex = 0;
+            await visit(ast, 'code', (node)=>{
+                if (node.meta === 'preview') {
+                    const { lang  } = node;
+                    checkCodeLang(lang);
+                    const { demoFilename , demoFilepath  } = getDemoFileInfo({
+                        rootDir,
+                        code: node.value,
+                        lang,
+                        filepath,
+                        index: demoIndex
+                    });
+                    const { pageFilename , pageFileCode  } = getPageFileInfo({
+                        rootDir,
+                        demoFilepath,
+                        demoFilename
+                    });
+                    genDemoPages({
+                        filepath,
+                        code: node.value,
+                        demoFilename,
+                        demoFilepath,
+                        pageFilename,
+                        pageFileCode
+                    });
+                    demoIndex += 1;
+                }
+            });
+        };
+    };
+}
+
+ //# sourceMappingURL=extractCodePlugin.mjs.map

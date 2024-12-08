@@ -1,0 +1,34 @@
+import path from 'path';
+import * as directoryTree from 'directory-tree';
+import fse from 'fs-extra';
+import { unified } from 'unified';
+import getExtractCodePlugin from './extractCodePlugin.mjs';
+import parse from 'remark-parse';
+import stringify from 'remark-stringify';
+function scanDocsDirectory(rootDir, docsPath) {
+    const docsDir = path.join(rootDir, docsPath);
+    const tree = directoryTree.default(docsDir, {
+        extensions: /\.mdx?$/,
+        exclude: /node_modules/
+    });
+    return tree;
+}
+function extractCodeFromDocs(docsTree, rootDir) {
+    var _docsTree_children;
+    (_docsTree_children = docsTree.children) === null || _docsTree_children === void 0 ? void 0 : _docsTree_children.forEach((sub)=>{
+        if (sub.children) {
+            extractCodeFromDocs(sub, rootDir);
+        } else {
+            const content = fse.readFileSync(sub.path, 'utf-8');
+            unified().use(parse).use(stringify).use(getExtractCodePlugin(sub.path, rootDir)).process(content);
+        }
+    });
+}
+export default function genDemoPages(rootDir, docsPath) {
+    const docsTree = scanDocsDirectory(rootDir, docsPath);
+    if (docsTree) {
+        extractCodeFromDocs(docsTree, rootDir);
+    }
+}
+
+ //# sourceMappingURL=index.mjs.map

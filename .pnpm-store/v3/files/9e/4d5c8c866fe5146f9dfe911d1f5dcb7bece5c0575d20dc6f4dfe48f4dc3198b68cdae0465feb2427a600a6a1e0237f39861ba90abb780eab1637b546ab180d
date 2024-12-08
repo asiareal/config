@@ -1,0 +1,12 @@
+import type { UserConfig, CommandArgs, EmptyObject, Json } from '../types.js';
+import type { CreateLoggerReturns } from './logger.js';
+export declare const mergeModeConfig: <K>(mode: string, userConfig: UserConfig<K>) => UserConfig<K>;
+export declare const resolveConfigFile: (configFile: string | string[], commandArgs: CommandArgs, rootDir: string) => Promise<string>;
+export declare const getUserConfig: <K extends EmptyObject>({ rootDir, commandArgs, logger, pkg, configFilePath, }: {
+    rootDir: string;
+    commandArgs: CommandArgs;
+    pkg: Json;
+    logger: CreateLoggerReturns;
+    configFilePath: string;
+}) => Promise<UserConfig<K>>;
+export declare function loadConfig<T>(filePath: string, pkg: Json, logger: CreateLoggerReturns): Promise<T | undefined>;

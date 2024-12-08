@@ -1,0 +1,1 @@
+export default function genDemoPages(rootDir: string, docsPath: string): void;

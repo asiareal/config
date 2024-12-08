@@ -1,0 +1,3 @@
+import type { RunTasks } from '../types.js';
+export declare const watchBundleTasks: RunTasks;
+export declare const buildBundleTasks: RunTasks;

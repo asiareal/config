@@ -1,0 +1,75 @@
+import * as path from 'path';
+import { init, parse } from 'es-module-lexer';
+import consola from 'consola';
+import MagicString from 'magic-string';
+import { createScriptsFilter } from '../utils.js';
+// aliasPlugin only available for transform task and ES Module
+const aliasPlugin = (rootDir, originalAlias) => {
+    const scriptFilter = createScriptsFilter();
+    return {
+        name: 'ice-pkg:transform-alias',
+        async transform(code, id) {
+            // only transform source code;
+            if (!code || !scriptFilter(id)) {
+                return null;
+            }
+            await init;
+            let imports = [];
+            try {
+                imports = parse(code)[0];
+            }
+            catch (e) {
+                consola.error('[parse error]', e);
+            }
+            if (!imports.length) {
+                return {
+                    code,
+                    map: null,
+                };
+            }
+            const alias = resolveAliasConfig(originalAlias, rootDir, id);
+            const str = new MagicString(code);
+            imports.forEach(({ n, s, e }) => {
+                const matchedEntry = Object.keys(alias).find((pattern) => matches(pattern, n));
+                if (matchedEntry) {
+                    const updatedId = n.replace(matchedEntry, alias[matchedEntry]);
+                    str.overwrite(s, e, updatedId);
+                }
+            });
+            return {
+                code: str.toString(),
+                map: str.generateMap({
+                    hires: true,
+                    includeContent: true,
+                }),
+            };
+        },
+    };
+};
+export function matches(pattern, importee) {
+    // empty importee or pattern just return false
+    if (!importee || !pattern) {
+        return false;
+    }
+    if (importee.length < pattern.length) {
+        return false;
+    }
+    if (importee === pattern) {
+        return true;
+    }
+    // eslint-disable-next-line prefer-template
+    return importee.startsWith(pattern + '/');
+}
+export function resolveAliasConfig(alias, rootDir, filePath) {
+    const newAlias = {};
+    Object.keys(alias).forEach((pattern) => {
+        const target = alias[pattern];
+        newAlias[pattern] = target[0] === '.' ?
+            // transform alias relative target to relative to the rootDir
+            path.relative(path.dirname(filePath), path.resolve(rootDir, target)).split(path.sep).join('/') || '.' :
+            target;
+    });
+    return newAlias;
+}
+export default aliasPlugin;
+//# sourceMappingURL=alias.js.map

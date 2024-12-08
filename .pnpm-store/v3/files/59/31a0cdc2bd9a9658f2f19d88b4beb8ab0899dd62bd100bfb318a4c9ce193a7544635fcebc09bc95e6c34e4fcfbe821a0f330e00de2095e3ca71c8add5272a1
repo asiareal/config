@@ -1,0 +1,2 @@
+export = resolveImports;
+declare function resolveImports(code: any, filePath: any): any;

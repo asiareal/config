@@ -1,0 +1,5 @@
+import type { Plugin } from 'rollup';
+declare const aliasPlugin: (rootDir: string, originalAlias: Record<string, string>) => Plugin;
+export declare function matches(pattern: string, importee: string): boolean;
+export declare function resolveAliasConfig(alias: Record<string, string>, rootDir: string, filePath: string): {};
+export default aliasPlugin;

@@ -1,0 +1,38 @@
+import merge from 'lodash.merge';
+import * as path from 'path';
+import fse from 'fs-extra';
+import getTaskConfig from './getTaskConfig.js';
+export default function defineJestConfig(service, userJestConfig) {
+    return async () => {
+        // Support jest configuration (object or function) Ref: https://jestjs.io/docs/configuration
+        let customJestConfig;
+        if (typeof userJestConfig === 'function') {
+            customJestConfig = await userJestConfig();
+        }
+        else {
+            customJestConfig = userJestConfig;
+        }
+        const defaultConfig = await getDefaultConfig(service);
+        return merge(defaultConfig, customJestConfig);
+    };
+}
+async function getDefaultConfig(service) {
+    const { taskConfig, context: { rootDir } } = await getTaskConfig(service);
+    const { alias = {}, define = {} } = taskConfig;
+    const moduleNameMapper = generateModuleNameMapper(rootDir, alias);
+    return {
+        moduleNameMapper,
+        globals: define,
+    };
+}
+function generateModuleNameMapper(rootDir, alias) {
+    const moduleNameMapper = {};
+    for (const key in alias) {
+        const aliasPath = alias[key];
+        const absoluteAliasPath = path.isAbsolute(aliasPath) ? aliasPath : path.join(rootDir, aliasPath);
+        const isDir = fse.lstatSync(absoluteAliasPath).isDirectory();
+        moduleNameMapper[`^${key}${isDir ? '/(.*)' : ''}`] = `${absoluteAliasPath}${isDir ? '/$1' : ''}`;
+    }
+    return moduleNameMapper;
+}
+//# sourceMappingURL=defineJestConfig.js.map
