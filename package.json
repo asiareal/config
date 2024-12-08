@@ -12,7 +12,8 @@
     "deploy": "gh-pages -d build",
     "create": "pnpm create @ice/pkg --workspace",
     "eslint": "eslint --cache --ext .js,.jsx,.ts,.tsx ./",
-    "eslint:fix": "pnpm eslint --fix"
+    "eslint:fix": "pnpm eslint --fix",
+    "ci:publish": "pnpm publish -r"
   },
   "devDependencies": {
     "@applint/spec": "^1.0.0",
