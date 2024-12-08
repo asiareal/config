@@ -1,11 +1,8 @@
 ---
-sidebar_label: 说明
-sidebar_position: 0
+sidebar_label: editorconfig
 ---
 
-# @asiareal/config-editorconfig
-
-.editorconfig 配置文件
+# .editorconfig 配置文件
 
 # 使用
 

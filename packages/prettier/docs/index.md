@@ -1,5 +1,5 @@
 ---
-sidebar_label: 说明
+sidebar_label: prettier
 sidebar_position: 0
 ---
 

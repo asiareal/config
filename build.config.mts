@@ -6,27 +6,11 @@ export default defineConfig({
       '@ice/pkg-plugin-docusaurus',
       {
         path: 'packages',
-        sidebarItemsGenerator: (args: any) => {
-          // The index.md doc should not be the category, so we rewrite the default isCategoryIndex function.
-          function isCategoryIndex({ fileName, directories }: any) {
-            const eligibleDocIndexNames: string[] = [
-              'readme',
-              directories[0].toLowerCase(),
-            ];
-            return eligibleDocIndexNames.includes(fileName.toLowerCase());
-          }
-          const defaultSidebarItems = args.defaultSidebarItemsGenerator({
-            ...args,
-            isCategoryIndex,
-          });
-          // 1. Remove the `docs` category.
-          // 2. Remove category link.
-          const newSidebarItems = defaultSidebarItems.map(({ link, ...rest }: any) => ({
-            ...rest,
-            items: rest.items.filter((item: any) => item.label === 'docs').map(item => item.items).flat(),
-          }));
-
-          return newSidebarItems;
+        sidebarItemsGenerator: async () => {
+          return [
+            { type: 'doc', id: 'prettier/docs/index', label: 'prettier' },
+            { type: 'doc', id: 'editorconfig/docs/index', label: 'editorconfig' },
+          ];
         },
         exclude: ['**/node_modules/**'],
         onBrokenLinks: 'warn',
@@ -35,6 +19,8 @@ export default defineConfig({
         navBarTitle: '@asiareal/config',
         url: 'https://asiareal.github.io',
         baseUrl: '/config',
+        navBarLogo: '/config/img/logo.png',
+        favicon: '/config/favicon.ico',
       },
     ],
   ],
