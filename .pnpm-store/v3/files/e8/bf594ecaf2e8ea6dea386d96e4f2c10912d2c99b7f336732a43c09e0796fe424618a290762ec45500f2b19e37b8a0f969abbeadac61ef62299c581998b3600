@@ -1,0 +1,10 @@
+import { getBuildTasks } from '../helpers/getBuildTasks.js';
+export default async function test(context) {
+    const buildTasks = getBuildTasks(context);
+    const taskConfigs = buildTasks.map(({ config }) => config);
+    return {
+        taskConfigs,
+        context,
+    };
+}
+//# sourceMappingURL=test.js.map

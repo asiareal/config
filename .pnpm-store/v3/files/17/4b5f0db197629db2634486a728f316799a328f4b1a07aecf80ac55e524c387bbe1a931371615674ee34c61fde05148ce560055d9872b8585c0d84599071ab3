@@ -1,0 +1,20 @@
+export default function formatAliasToTSPathsConfig(alias) {
+    const paths = {};
+    Object.entries(alias || {}).forEach(([key, value]) => {
+        const [pathKey, pathValue] = formatPath(key, value);
+        paths[pathKey] = [pathValue];
+    });
+    return paths;
+}
+function formatPath(key, value) {
+    if (key.endsWith('$')) {
+        return [key.replace(/\$$/, ''), value];
+    }
+    // abc -> abc/*
+    // abc/ -> abc/*
+    return [addWildcard(key), addWildcard(value)];
+}
+function addWildcard(str) {
+    return `${str.endsWith('/') ? str : `${str}/`}*`;
+}
+//# sourceMappingURL=formatAliasToTSPathsConfig.js.map

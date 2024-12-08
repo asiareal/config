@@ -1,0 +1,15 @@
+import { mergeValueToTaskConfig } from '../utils.js';
+function getCliOptions() {
+    const cliOptions = [
+        {
+            name: 'analyzer',
+            commands: ['start', 'build'],
+            setConfig: (config, analyzer) => {
+                return mergeValueToTaskConfig(config, 'analyzer', analyzer);
+            },
+        },
+    ];
+    return cliOptions;
+}
+export default getCliOptions;
+//# sourceMappingURL=cliOptions.js.map

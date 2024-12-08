@@ -1,0 +1,4 @@
+import { TaskConfig } from '../types.js';
+export default function formatAliasToTSPathsConfig(alias: TaskConfig['alias']): {
+    [from: string]: [string];
+};

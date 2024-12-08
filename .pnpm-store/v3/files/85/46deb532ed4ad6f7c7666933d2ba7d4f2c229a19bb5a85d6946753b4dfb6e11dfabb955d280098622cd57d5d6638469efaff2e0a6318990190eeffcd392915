@@ -1,0 +1,28 @@
+import merge from 'lodash.merge';
+import getTaskConfig from './getTaskConfig.js';
+export default function defineVitestConfig(service, userConfig) {
+    return async (env) => {
+        // Support vitest configuration (object or function) Ref: https://github.com/vitest-dev/vitest/blob/e5c40cff0925c3c12d8cdfa59f5649d3562668ce/packages/vitest/src/config.ts#L3
+        let customConfig;
+        if (typeof userConfig === 'function') {
+            customConfig = await userConfig(env);
+        }
+        else {
+            customConfig = await userConfig;
+        }
+        const defaultConfig = await getDefaultConfig(service);
+        return merge(defaultConfig, customConfig);
+    };
+}
+async function getDefaultConfig(service) {
+    const { taskConfig } = await getTaskConfig(service);
+    const { alias = {}, define = {} } = taskConfig;
+    return {
+        resolve: {
+            alias,
+        },
+        // FIXME: pass the custom define config
+        define,
+    };
+}
+//# sourceMappingURL=defineVitestConfig.js.map

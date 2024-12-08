@@ -1,0 +1,11 @@
+import type { Plugin } from 'rollup';
+import type { TaskConfig, UserConfig } from '../types.js';
+interface DtsPluginOptions {
+    rootDir: string;
+    entry: Record<string, string>;
+    alias: TaskConfig['alias'];
+    outputDir: string;
+    generateTypesForJs?: UserConfig['generateTypesForJs'];
+}
+declare function dtsPlugin({ rootDir, alias, generateTypesForJs, outputDir, }: DtsPluginOptions): Plugin;
+export default dtsPlugin;

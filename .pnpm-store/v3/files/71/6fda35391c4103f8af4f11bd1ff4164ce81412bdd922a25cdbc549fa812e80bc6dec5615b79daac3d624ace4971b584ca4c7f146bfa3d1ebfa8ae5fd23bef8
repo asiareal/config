@@ -1,0 +1,2 @@
+export = checkCodeLang;
+declare function checkCodeLang(lang: any): void;

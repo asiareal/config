@@ -1,0 +1,3 @@
+import { Fragment } from './index.js';
+export { Fragment };
+export declare function jsxDEV(type: any, props: object, key: string, isStaticChildren: boolean, source: object, self: any): any;

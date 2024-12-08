@@ -1,0 +1,16 @@
+import * as chokidar from 'chokidar';
+import type { TaskConfig, WatchChangedFile, WatchEvent } from '../types.js';
+type WatchCallback = (changedFiles: WatchChangedFile[]) => (Promise<void>);
+export declare const createWatcher: (taskConfigs: TaskConfig[]) => chokidar.FSWatcher;
+export declare function createBatchChangeHandler(changeCallback: WatchCallback): {
+    /**
+     * Block and cache file changes event, do not trigger change handler
+     */
+    beginBlock(): void;
+    /**
+     * Trigger change handler since beginBlock
+     */
+    endBlock(): void;
+    onChange: (id: string, event: WatchEvent) => Promise<void>;
+};
+export {};

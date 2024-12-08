@@ -1,0 +1,8 @@
+import { Service } from 'build-scripts';
+import type { TaskConfig, UserConfig } from './types.js';
+declare const pkgService: Service<TaskConfig, {}, UserConfig>;
+export default pkgService;
+export * from './test/index.js';
+export * from './types.js';
+export { getBuiltInPlugins } from './utils.js';
+export { defineConfig } from './defineConfig.js';

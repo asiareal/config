@@ -1,0 +1,4 @@
+import { BundleTaskConfig, Context, TaskValue, TransformTaskConfig, NodeEnvMode } from '../types.js';
+import type { Config } from '@swc/core';
+export declare const getDefaultBundleSwcConfig: (bundleTaskConfig: BundleTaskConfig, ctx: Context, taskName: TaskValue) => Config;
+export declare const getDefaultTransformSwcConfig: (transformTaskConfig: TransformTaskConfig, ctx: Context, taskName: TaskValue, mode: NodeEnvMode) => Config;

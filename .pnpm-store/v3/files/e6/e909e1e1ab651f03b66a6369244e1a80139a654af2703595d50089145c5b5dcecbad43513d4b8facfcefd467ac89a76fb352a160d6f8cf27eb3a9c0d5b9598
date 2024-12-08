@@ -1,0 +1,4 @@
+import type { Config as JestConfig } from 'jest';
+import type { Service } from 'build-scripts';
+import type { TaskConfig, UserConfig } from '../types';
+export default function defineJestConfig(service: Service<TaskConfig, {}, UserConfig>, userJestConfig: JestConfig | (() => Promise<JestConfig>)): () => Promise<JestConfig>;

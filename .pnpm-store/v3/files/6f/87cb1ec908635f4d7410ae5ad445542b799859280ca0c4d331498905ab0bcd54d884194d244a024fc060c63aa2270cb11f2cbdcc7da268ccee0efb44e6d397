@@ -1,0 +1,6 @@
+import type { Service } from 'build-scripts';
+import type { TaskConfig, UserConfig } from '../types';
+export default function getTaskConfig(service: Service<TaskConfig, {}, UserConfig>): Promise<{
+    taskConfig: TaskConfig;
+    context: any;
+}>;

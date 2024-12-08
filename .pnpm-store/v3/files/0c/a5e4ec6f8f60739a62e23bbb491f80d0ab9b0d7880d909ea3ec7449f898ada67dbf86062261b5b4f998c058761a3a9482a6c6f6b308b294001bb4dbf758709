@@ -1,0 +1,8 @@
+import type { Config } from '@swc/core';
+import type { TaskConfig, BundleTaskConfig } from '../types.js';
+import type { Plugin } from 'rollup';
+/**
+ * plugin-swc works as substitute of plugin-typescript, babel, babel-preset-env and plugin-minify.
+ */
+declare const swcPlugin: (jsxRuntime: TaskConfig['jsxRuntime'], rootDir: string, extraSwcOptions?: Config, compileDependencies?: BundleTaskConfig['compileDependencies']) => Plugin;
+export default swcPlugin;

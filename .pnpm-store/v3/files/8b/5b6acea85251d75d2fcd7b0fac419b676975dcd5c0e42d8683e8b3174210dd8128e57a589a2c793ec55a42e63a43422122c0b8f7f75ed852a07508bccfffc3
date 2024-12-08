@@ -1,0 +1,15 @@
+import { Fragment } from 'react/jsx-runtime';
+/**
+ * https://github.com/reactjs/rfcs/pull/107
+ * @param {*} type
+ * @param {object} props
+ * @param {string} maybeKey
+ * @param {object} source
+ * @param {any} self
+ */
+export declare function jsx(type: any, props: object, maybeKey: string, source: object, self: any): any;
+export declare function jsxs(type: any, props: object, maybeKey: string, source: object, self: any): any;
+export declare function hijackElementProps(props: {
+    style?: object;
+} | object): object;
+export { Fragment, };

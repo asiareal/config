@@ -1,0 +1,3 @@
+import type { Plugin } from '@ice/pkg';
+declare const plugin: Plugin;
+export default plugin;

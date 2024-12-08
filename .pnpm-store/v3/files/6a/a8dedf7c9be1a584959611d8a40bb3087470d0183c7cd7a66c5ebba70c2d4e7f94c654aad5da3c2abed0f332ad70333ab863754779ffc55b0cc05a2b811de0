@@ -1,0 +1,39 @@
+// @ts-ignore
+import { jsx as _jsx, jsxs as _jsxs, Fragment } from "react/jsx-runtime";
+// @ts-ignore
+import { convertUnit } from "style-unit";
+var STYLE = "style";
+/**
+ * https://github.com/reactjs/rfcs/pull/107
+ * @param {*} type
+ * @param {object} props
+ * @param {string} maybeKey
+ * @param {object} source
+ * @param {any} self
+ */ export function jsx(type, props, maybeKey, source, self) {
+    return _jsx(type, hijackElementProps(props), maybeKey, source, self);
+}
+// Same as jsx method, special case jsxs internally to take advantage of static children.
+// // for now we can ship identical prod functions.
+export function jsxs(type, props, maybeKey, source, self) {
+    return _jsxs(type, hijackElementProps(props), maybeKey, source, self);
+}
+function isObject(obj) {
+    return typeof obj === "object";
+}
+// Support rpx unit.
+export function hijackElementProps(props) {
+    if (props && STYLE in props) {
+        var style = props.style;
+        if (isObject(style)) {
+            var result = Object.assign({}, props);
+            var convertedStyle = {};
+            for(var prop in style)// @ts-ignore
+            convertedStyle[prop] = typeof style[prop] === "string" ? convertUnit(style[prop]) : style[prop];
+            result["style"] = convertedStyle;
+            return result;
+        }
+    }
+    return props;
+}
+export { Fragment };

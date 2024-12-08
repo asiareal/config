@@ -1,0 +1,2 @@
+import type { Context } from '../types.js';
+export default function start(context: Context): Promise<void>;

@@ -1,0 +1,2 @@
+import type { Context, BuildTask } from '../types.js';
+export declare function getBuildTasks(context: Context): BuildTask[];

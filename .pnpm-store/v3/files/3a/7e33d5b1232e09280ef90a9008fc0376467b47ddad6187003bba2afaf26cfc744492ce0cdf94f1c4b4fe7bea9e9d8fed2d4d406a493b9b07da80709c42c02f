@@ -1,0 +1,8 @@
+import * as swc from '@swc/core';
+import type { Plugin } from 'rollup';
+import type { TaskConfig } from '../types';
+/**
+ * plugin-minify use minimize bundle outputs using swc
+ */
+declare const minifyPlugin: (sourcemap: TaskConfig['sourcemap'], minifyOptions: swc.JsMinifyOptions) => Plugin;
+export default minifyPlugin;

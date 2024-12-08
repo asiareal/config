@@ -1,0 +1,5 @@
+import type { Context } from '../types.js';
+export default function test(context: Context): Promise<{
+    taskConfigs: import("../types.js").TaskConfig[];
+    context: Context;
+}>;

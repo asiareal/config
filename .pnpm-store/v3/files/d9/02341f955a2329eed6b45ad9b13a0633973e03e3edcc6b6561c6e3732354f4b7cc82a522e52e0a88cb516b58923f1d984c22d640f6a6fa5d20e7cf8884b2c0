@@ -1,0 +1,66 @@
+/// <reference types="node" />
+import debug from 'debug';
+import type { PlainObject, OutputResult, TaskConfig } from './types';
+import type { DecodedSourceMap, RawSourceMap } from '@ampproject/remapping';
+import type { FSWatcher } from 'chokidar';
+export declare function toArray<T>(any: T | T[]): T[];
+export declare function slash(p: string): string;
+export declare const externalRE: RegExp;
+export declare const isExternalUrl: (url: string) => boolean;
+export declare const isWindows: boolean;
+export declare function normalizePath(id: string): string;
+export declare function ensureWatchedFile(watcher: FSWatcher, file: string | null, root: string): void;
+export declare function createDebugger(namespace: string): debug.Debugger['log'];
+export declare function numberToPos(source: string, offset: number | {
+    line: number;
+    column: number;
+}): {
+    line: number;
+    column: number;
+};
+export declare function posToNumber(source: string, pos: number | {
+    line: number;
+    column: number;
+}): number;
+export declare function generateCodeFrame(source: string, start?: number | {
+    line: number;
+    column: number;
+}, end?: number): string;
+export declare function combineSourcemaps(filename: string, sourcemapList: Array<DecodedSourceMap | RawSourceMap>): RawSourceMap;
+export declare const require: NodeRequire;
+export declare const safeRequire: (filePath: string) => any;
+/**
+ * check if path is dir
+ * @param name
+ * @returns Promise<Boolean>
+ */
+export declare const isDirectory: (name: string) => boolean;
+export declare const isFile: (name: string) => boolean;
+export declare const isObject: (value: unknown) => value is Record<string, any>;
+export declare const booleanToObject: (value: object | boolean) => object;
+export declare function debouncePromise<T extends unknown[]>(fn: (...args: T) => Promise<OutputResult[]>, delay: number, onError: (err: unknown) => void): (...args: Parameters<typeof fn>) => Promise<unknown>;
+export declare const timeFrom: (start: number, subtract?: number) => string;
+export declare const unique: <T>(arr: T[]) => T[];
+export declare const stringifyObject: (obj: PlainObject) => {};
+export declare function getIncludeNodeModuleScripts(compileDependencies: boolean | Array<RegExp | string>): RegExp[];
+/**
+ * @reason cnpm node_modules path is different from npm/pnpm, it will not match the compileDependencies
+ *
+ * @example transform react/node_modules/_idb@7.1.1@idb/build/index.js to react/node_modules/idb/build/index.js
+ */
+export declare function formatCnpmDepFilepath(filepath: string): string;
+/**
+ * default include src/**.m?[jt]sx? but exclude .d.ts file
+ *
+ * @param extraInclude include other file types
+ * @param extraExclude exclude other file types
+ *
+ * @example exclude node_modules createScriptsFilter([], [/node_modules/])
+ */
+export declare const createScriptsFilter: (extraIncludes?: RegExp[], extraExcludes?: RegExp[]) => (id: unknown) => boolean;
+export declare const cwd: string;
+export declare function normalizeSlashes(file: string): string;
+export declare function mergeValueToTaskConfig<C = TaskConfig, T = any>(config: C, key: string, value: T): C;
+export declare function getEntryItems(entry: TaskConfig['entry']): string[];
+export declare function checkDependencyExists(dependency: string, link: string): any;
+export declare const getBuiltInPlugins: () => string[];

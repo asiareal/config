@@ -1,0 +1,76 @@
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
+import { extname } from 'path';
+import { createFilter } from '@rollup/pluginutils';
+import { dtsCompile } from '../helpers/dts.js';
+// dtsPlugin is used to generate declaration file when transforming
+function dtsPlugin({ rootDir, alias, generateTypesForJs, outputDir, }) {
+    const includeFileRegexps = [/\.(?:[cm]?ts|tsx)$/];
+    if (generateTypesForJs) {
+        includeFileRegexps.push(/\.(?:[cm]?js|jsx)$/);
+    }
+    const dtsFilter = createFilter(includeFileRegexps, // include
+    [/node_modules/, /\.d\.[cm]?ts$/]);
+    // Actually, it's useful in dev.
+    const cachedContents = {};
+    return {
+        name: 'ice-pkg:dts',
+        transform(code, id) {
+            if (dtsFilter(id)) {
+                if (!cachedContents[id]) {
+                    cachedContents[id] = {
+                        srcCode: code,
+                        updated: true,
+                        ext: extname(id),
+                        filePath: id,
+                    };
+                }
+                else if (cachedContents[id].srcCode !== code) {
+                    cachedContents[id].srcCode = code;
+                    cachedContents[id].updated = true;
+                }
+            }
+            // Always return null to escape transforming
+            return null;
+        },
+        async buildEnd() {
+            // should re-run typescript programs
+            const updatedIds = Object.keys(cachedContents).filter((id) => cachedContents[id].updated);
+            let dtsFiles;
+            if (updatedIds.length) {
+                const files = updatedIds.map((id) => ({
+                    ext: cachedContents[id].ext,
+                    filePath: id,
+                    srcCode: cachedContents[id].srcCode,
+                }));
+                dtsFiles = await dtsCompile({ files, alias, rootDir, outputDir });
+            }
+            else {
+                dtsFiles = Object.keys(cachedContents).map((id) => {
+                    const _a = cachedContents[id], { updated } = _a, rest = __rest(_a, ["updated"]);
+                    return Object.assign({}, rest);
+                });
+            }
+            dtsFiles.forEach((file) => {
+                this.emitFile({
+                    type: 'asset',
+                    fileName: file.dtsPath,
+                    source: file.dtsContent,
+                });
+                cachedContents[file.filePath] = Object.assign(Object.assign({}, cachedContents[file.filePath]), file);
+            });
+            updatedIds.forEach((updateId) => { cachedContents[updateId].updated = false; });
+        },
+    };
+}
+export default dtsPlugin;
+//# sourceMappingURL=dts.js.map

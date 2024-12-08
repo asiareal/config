@@ -1,0 +1,47 @@
+/**
+ * This plugin is used to be as a supplement for swc.
+ */
+import * as babel from '@babel/core';
+import { createScriptsFilter, formatCnpmDepFilepath, getIncludeNodeModuleScripts } from '../utils.js';
+import getBabelOptions from '../helpers/getBabelOptions.js';
+const getParserPlugins = (isTS) => {
+    const commonPlugins = [
+        'jsx',
+        'importMeta',
+        'topLevelAwait',
+        'classProperties',
+        'classPrivateMethods',
+    ];
+    if (isTS) {
+        return [
+            ...commonPlugins,
+            'typescript',
+            'decorators-legacy',
+        ];
+    }
+    return commonPlugins;
+};
+const babelPlugin = (plugins, options, compileDependencies, modifyBabelOptions) => {
+    // https://babeljs.io/docs/en/babel-preset-react#usage
+    const babelOptions = getBabelOptions(plugins, options, modifyBabelOptions);
+    const scriptsFilter = createScriptsFilter(getIncludeNodeModuleScripts(compileDependencies));
+    return {
+        name: 'ice-pkg:babel',
+        transform(source, id) {
+            if (!scriptsFilter(formatCnpmDepFilepath(id))) {
+                return null;
+            }
+            const parserPlugins = getParserPlugins(/\.tsx?$/.test(id));
+            const { code, map } = babel.transformSync(source, Object.assign(Object.assign({}, babelOptions), { babelrc: false, configFile: false, filename: id, parserOpts: {
+                    sourceType: 'module',
+                    plugins: parserPlugins,
+                }, sourceFileName: id }));
+            return {
+                code,
+                map,
+            };
+        },
+    };
+};
+export default babelPlugin;
+//# sourceMappingURL=babel.js.map

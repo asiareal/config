@@ -1,0 +1,5 @@
+import { NodeEnvMode } from '../types';
+export default function getDefaultDefineValues(mode: NodeEnvMode): {
+    __DEV__: string;
+    'process.env.NODE_ENV': string;
+};

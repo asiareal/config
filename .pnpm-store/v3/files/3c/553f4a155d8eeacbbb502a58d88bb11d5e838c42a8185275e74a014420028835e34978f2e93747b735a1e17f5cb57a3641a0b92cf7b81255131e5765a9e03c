@@ -1,0 +1,14 @@
+/**
+ * load package.json
+ * @param cwd
+ * @returns
+ */
+export declare function loadPkg(cwd: string): any;
+/**
+ * load entry files
+ * @param entry
+ * @returns
+ */
+export declare function loadEntryFiles(entry: string, excludes: string | string[]): string[];
+export declare const INCLUDES_UTF8_FILE_TYPE: RegExp;
+export declare function loadSource(path: string): string;

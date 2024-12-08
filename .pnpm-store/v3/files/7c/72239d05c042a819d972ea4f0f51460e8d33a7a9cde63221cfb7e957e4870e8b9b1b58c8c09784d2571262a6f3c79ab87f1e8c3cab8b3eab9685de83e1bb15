@@ -1,0 +1,20 @@
+declare function _exports(context: any): {
+    name: string;
+    configureWebpack(config: any, isServer: any, utils: any): {
+        resolve: {
+            alias: {
+                react: string;
+                'react-dom': string;
+                'react/jsx-runtime': string;
+                '@mdx-js/react': string;
+                'style-unit': string;
+            };
+        };
+        plugins: webpack.ProvidePlugin[];
+        snapshot: {
+            immutablePaths: string[];
+        };
+    };
+};
+export = _exports;
+import webpack = require("webpack");

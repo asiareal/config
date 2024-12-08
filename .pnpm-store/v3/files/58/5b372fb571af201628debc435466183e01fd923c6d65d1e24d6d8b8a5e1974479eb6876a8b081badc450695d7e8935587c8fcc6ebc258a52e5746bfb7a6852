@@ -1,0 +1,84 @@
+{
+  "name": "hast-util-find-and-replace",
+  "version": "3.2.1",
+  "description": "hast utility to find and replace text in a tree",
+  "license": "MIT",
+  "keywords": [
+    "unist",
+    "hast",
+    "hast-util",
+    "util",
+    "utility",
+    "html",
+    "find",
+    "replace"
+  ],
+  "repository": "syntax-tree/hast-util-find-and-replace",
+  "bugs": "https://github.com/syntax-tree/hast-util-find-and-replace/issues",
+  "funding": {
+    "type": "opencollective",
+    "url": "https://opencollective.com/unified"
+  },
+  "author": "Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)",
+  "contributors": [
+    "Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)"
+  ],
+  "files": [
+    "index.js"
+  ],
+  "dependencies": {
+    "escape-string-regexp": "^4.0.0",
+    "hast-util-is-element": "^1.1.0",
+    "unist-util-visit-parents": "^3.0.0"
+  },
+  "devDependencies": {
+    "browserify": "^17.0.0",
+    "hastscript": "^6.0.0",
+    "nyc": "^15.0.0",
+    "prettier": "^2.0.0",
+    "remark-cli": "^9.0.0",
+    "remark-preset-wooorm": "^8.0.0",
+    "tape": "^5.0.0",
+    "tinyify": "^3.0.0",
+    "xo": "^0.37.0"
+  },
+  "scripts": {
+    "format": "remark . -qfo && prettier . -w --loglevel warn && xo --fix",
+    "build-bundle": "browserify . -s hastUtilFindAndReplace -o hast-util-find-and-replace.js",
+    "build-mangle": "browserify . -s hastUtilFindAndReplace -o hast-util-find-and-replace.min.js -p tinyify",
+    "build": "npm run build-bundle && npm run build-mangle",
+    "test-api": "node test",
+    "test-coverage": "nyc --reporter lcov tape test.js",
+    "test": "npm run format && npm run build && npm run test-coverage"
+  },
+  "prettier": {
+    "tabWidth": 2,
+    "useTabs": false,
+    "singleQuote": true,
+    "bracketSpacing": false,
+    "semi": false,
+    "trailingComma": "none"
+  },
+  "xo": {
+    "prettier": true,
+    "esnext": false,
+    "rules": {
+      "unicorn/prefer-type-error": "off",
+      "guard-for-in": "off"
+    },
+    "ignores": [
+      "hast-util-find-and-replace.js"
+    ]
+  },
+  "nyc": {
+    "check-coverage": true,
+    "lines": 100,
+    "functions": 100,
+    "branches": 100
+  },
+  "remarkConfig": {
+    "plugins": [
+      "preset-wooorm"
+    ]
+  }
+}

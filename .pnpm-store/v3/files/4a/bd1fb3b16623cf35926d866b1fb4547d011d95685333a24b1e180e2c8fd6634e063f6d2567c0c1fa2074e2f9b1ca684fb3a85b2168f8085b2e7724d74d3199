@@ -1,0 +1,8 @@
+export = genDemoPages;
+declare function genDemoPages({ filepath, code, demoFilepath, pageFilename, pageFileCode }: {
+    filepath: any;
+    code: any;
+    demoFilepath: any;
+    pageFilename: any;
+    pageFileCode: any;
+}): void;

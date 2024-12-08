@@ -1,0 +1,19 @@
+import type { TaskConfig } from '../types.js';
+export type FileExt = 'js' | 'ts' | 'tsx' | 'jsx' | 'cjs' | 'mjs' | 'mts' | 'cts';
+export interface File {
+    filePath: string;
+    ext: FileExt;
+    srcCode?: string;
+}
+export interface DtsInputFile extends File {
+    dtsContent?: string | null;
+    dtsPath?: string;
+}
+interface DtsCompileOptions {
+    files: File[];
+    alias: TaskConfig['alias'];
+    rootDir: string;
+    outputDir: string;
+}
+export declare function dtsCompile({ files, alias, rootDir, outputDir }: DtsCompileOptions): Promise<DtsInputFile[]>;
+export {};

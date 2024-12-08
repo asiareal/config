@@ -1,0 +1,1 @@
+export default function getExtractCodePlugin(filepath: string, rootDir: string): () => (ast: any) => Promise<void>;

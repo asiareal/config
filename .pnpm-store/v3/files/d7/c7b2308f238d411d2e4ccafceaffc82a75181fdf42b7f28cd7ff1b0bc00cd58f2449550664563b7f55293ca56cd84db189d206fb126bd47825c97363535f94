@@ -1,0 +1,51 @@
+import type { InputOptions, OutputOptions, ModuleInfo, PartialResolvedId, LoadResult, SourceDescription, Plugin } from 'rollup';
+import * as acorn from 'acorn';
+import type { FSWatcher } from 'chokidar';
+export declare const FS_PREFIX = "/@fs/";
+interface SourceMapV3 {
+    file?: string | null;
+    names: string[];
+    sourceRoot?: string;
+    sources: Array<string | null>;
+    sourcesContent?: Array<string | null>;
+    version: 3;
+}
+export interface RawSourceMap extends SourceMapV3 {
+    mappings: string;
+}
+export interface PluginContainerOptions {
+    cwd?: string;
+    output?: OutputOptions;
+    modules?: Map<string, {
+        info: ModuleInfo;
+    }>;
+    writeFile?: (name: string, source: string | Uint8Array) => void;
+}
+export interface PluginContainer {
+    options: InputOptions;
+    getModuleInfo: (id: string) => ModuleInfo | null;
+    buildStart: (options: InputOptions) => Promise<void>;
+    resolveId: (id: string, importer?: string, options?: {
+        skip?: Set<Plugin>;
+        ssr?: boolean;
+    }) => Promise<PartialResolvedId | null>;
+    transform: (code: string, id: string, options?: {
+        inMap?: SourceDescription['map'];
+        ssr?: boolean;
+    }) => Promise<SourceDescription | null>;
+    load: (id: string, options?: {
+        ssr?: boolean;
+    }) => Promise<LoadResult | null>;
+    close: () => Promise<void>;
+}
+export declare let parser: typeof acorn.Parser;
+export declare function createPluginContainer({ plugins, logger, root, output, build: { rollupOptions } }: {
+    plugins: any;
+    logger: any;
+    root: any;
+    output: any;
+    build: {
+        rollupOptions: any;
+    };
+}, moduleGraph?: any, watcher?: FSWatcher): Promise<PluginContainer>;
+export {};

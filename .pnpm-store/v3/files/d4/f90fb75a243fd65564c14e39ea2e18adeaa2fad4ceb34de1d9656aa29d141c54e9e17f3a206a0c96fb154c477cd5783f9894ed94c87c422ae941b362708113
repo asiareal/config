@@ -1,0 +1,3 @@
+import { Context, TaskRunnerContext } from '../types.js';
+import type { RollupOptions } from 'rollup';
+export declare function getRollupOptions(context: Context, taskRunnerContext: TaskRunnerContext): RollupOptions;

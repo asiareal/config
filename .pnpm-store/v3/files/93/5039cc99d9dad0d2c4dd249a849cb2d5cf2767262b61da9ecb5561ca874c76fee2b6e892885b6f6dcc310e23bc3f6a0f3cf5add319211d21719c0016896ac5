@@ -1,0 +1,15 @@
+/**
+ * This plugin is used to be as a supplement for swc.
+ */
+import * as babel from '@babel/core';
+import { Plugin } from 'rollup';
+import type { BundleTaskConfig } from '../types.js';
+import { TransformOptions } from '@babel/core';
+export interface BabelPluginOptions {
+    pragma?: string;
+    /** @default automatic */
+    jsxRuntime?: 'classic' | 'automatic';
+    pragmaFrag?: string;
+}
+declare const babelPlugin: (plugins: babel.PluginItem[], options: BabelPluginOptions, compileDependencies?: BundleTaskConfig['compileDependencies'], modifyBabelOptions?: (babelCompileOptions: TransformOptions) => TransformOptions) => Plugin;
+export default babelPlugin;
