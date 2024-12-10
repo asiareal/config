@@ -10,6 +10,7 @@ export default defineConfig({
           return [
             { type: 'doc', id: 'prettier/docs/index', label: 'prettier' },
             { type: 'doc', id: 'editorconfig/docs/index', label: 'editorconfig' },
+            { type: 'doc', id: 'tsconfig/docs/index', label: 'tsconfig' },
           ];
         },
         exclude: ['**/node_modules/**'],

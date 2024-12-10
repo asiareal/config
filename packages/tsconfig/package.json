@@ -1,0 +1,25 @@
+{
+  "name": "@asiareal/config-ts",
+  "version": "0.1.0",
+  "description": "tsconfig",
+  "files": [
+    "tsconfig.json"
+  ],
+  "main": "tsconfig.json",
+  "sideEffects": false,
+  "keywords": [
+    "config",
+    "typescript"
+  ],
+  "peerDependencies": {
+    "typescript": "^5.7.2"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2",
+    "typescript-plugin-css-modules": "^5.1.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "MIT"
+}
