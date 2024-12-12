@@ -11,6 +11,12 @@
     "config",
     "prettier"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/asiareal/config.git",
+    "directory": "packages/prettier"
+  },
+  "homepage": "https://asiareal.github.io/config/",
   "peerDependencies": {
     "prettier": "^2.4.0"
   },

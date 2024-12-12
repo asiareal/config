@@ -1,0 +1,15 @@
+{
+  "name": "@asiareal/docs",
+  "version": "0.1.0",
+  "private": true,
+  "description": "config docs",
+  "sideEffects": false,
+  "keywords": [
+    "docs",
+    "config"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "MIT"
+}
