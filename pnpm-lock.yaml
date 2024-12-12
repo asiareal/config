@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@ice/jsx-runtime':
+        specifier: ^0.3.1
+        version: 0.3.1(react@18.3.1)
       posthog-js:
         specifier: ^1.197.0
         version: 1.197.0
@@ -1256,6 +1259,11 @@ packages:
 
   '@ice/jsx-runtime@0.2.2':
     resolution: {integrity: sha512-RKwn3QgqualrWz+HxGZh7gS5lmCHIwvF6oVRsZbUI6Ekll98RrgGGvUvkn1SdSF7fYqWOG4ZA4neplBCJqf4NA==}
+    peerDependencies:
+      react: ^16 || ^17 || ^18
+
+  '@ice/jsx-runtime@0.3.1':
+    resolution: {integrity: sha512-GolndNTNHkyMcYburtvAgMb8U0hLdBy/qplSdilg3dVmxj2J6BhevBBAl8+biXuBsLcAs0+qW9DI2zQG2w0O4w==}
     peerDependencies:
       react: ^16 || ^17 || ^18
 
@@ -8629,6 +8637,12 @@ snapshots:
 
   '@ice/jsx-runtime@0.2.2(react@18.3.1)':
     dependencies:
+      react: 18.3.1
+      style-unit: 3.0.5
+
+  '@ice/jsx-runtime@0.3.1(react@18.3.1)':
+    dependencies:
+      '@swc/helpers': 0.5.15
       react: 18.3.1
       style-unit: 3.0.5
 
